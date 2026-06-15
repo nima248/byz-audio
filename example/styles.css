@@ -1,0 +1,158 @@
+:root {
+    --main-color: ivory;
+    --secondary-color: gainsboro;
+
+    --bg: hsl(0, 0%, 11%);
+
+    --btn-bg: hsl(0, 0%, 28%);
+    --btn-bg-hover: hsl(0, 0%, 34%);
+    --btn-bg-disabled: var(--bg);
+    --btn-border-col: hsl(0, 0%, 37%);
+
+    --note-btn-active-bg: hsl(120, 50%, 28%);
+    --note-btn-active-bg-hover: hsl(120, 50%, 34%);
+    --note-btn-active-border-col: hsl(120, 50%, 37%);
+
+    --note-btn-size: min((100/450)*100vw, 100px);
+    --note-btn-gap: min((10/450)*100vw, 10px);
+
+    --pitch-btn-size: 50px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    touch-action: none;
+}
+
+html {
+    font-family: sans-serif;
+    font-size: 1.3rem;
+    line-height: 1.6;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    color: var(--main-color);
+    background-color: var(--bg);
+}
+
+h2 {
+    font-weight: 200;
+}
+
+#app-layout {
+    font-family: sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+}
+
+#content {
+    margin: auto;
+    padding: 10px;
+}
+
+button {
+    color: var(--main-color);
+    background-color: var(--btn-bg);
+    border: 4px solid var(--btn-border-col);
+}
+
+button:hover {
+    background-color: var(--btn-bg-hover);
+}
+
+#note-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--note-btn-gap);
+    width: calc(var(--note-btn-size * 4 + --note-btn-gap * 3));
+}
+
+.note-row{
+    display: flex;
+    gap: var(--note-btn-gap);
+}
+
+.align-left,
+.align-right {
+    flex: none;
+}
+.align-left { justify-content: flex-start; }
+.align-right { justify-content: flex-end; }
+
+.note-btn {
+    font-size: 32px;
+    font-weight: 700;
+    height: var(--note-btn-size);
+    width: var(--note-btn-size);
+    border-radius: 20px;
+    position: relative;
+}
+
+.note-btn.no-audio-available,
+.note-btn.no-audio-available:hover,
+.pitch-btn:disabled,
+.pitch-btn:disabled:hover {
+    color: grey;
+    background-color: var(--note-btn-bg-disabled);
+}
+
+.note-btn.active-note,
+.note-btn.active-note:hover {
+    background-color: var(--note-btn-active-bg);
+    border-color: var(--note-btn-active-border-col);
+}
+
+.note-btn.active-note:hover {
+    background-color: var(--note-btn-active-bg-hover);
+}
+
+#pitch-control {
+    font-size: 28px;
+    font-weight: 600;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.pitch-btn {
+    font-size: 32px;
+    font-weight: 700;
+    height: var(--pitch-btn-size);
+    width: var(--pitch-btn-size);
+    border-radius: 10px;
+}
+
+#pitch-shift {
+    width: 90px;
+    text-align: center;
+}
+
+.radio {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 15px 5px 15px;
+}
+
+.radio label {
+    padding-left: 14px;
+}

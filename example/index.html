@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="icon" href="data:," >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <h1>byz-audio example page</h1>
+  <body>
+    <div id="app-layout">
+      <div id="content">
+        <div id="note-grid">
+          <div class="note-row align-left">
+            <button class="note-btn" id="note-high-ni">Νη</button>
+          </div>
+          <div class="note-row">
+            <button class="note-btn" id="note-di">Δι</button>
+            <button class="note-btn" id="note-ke">Κε</button>
+            <button class="note-btn" id="note-zo-flat">Ζω flat</button>
+            <button class="note-btn" id="note-zo">Ζω</button>
+          </div>
+          <div class="note-row">
+            <button class="note-btn" id="note-ni">Νη</button>
+            <button class="note-btn" id="note-pa">Πα</button>
+            <button class="note-btn" id="note-bou">Βου</button>
+            <button class="note-btn" id="note-ga">Γα</button>
+          </div>
+          <div class="note-row">
+            <button class="note-btn" id="note-low-di">Δι</button>
+            <button class="note-btn" id="note-low-ke">Κε</button>
+            <button class="note-btn" id="note-low-zo-flat">Ζω flat</button>
+            <button class="note-btn" id="note-low-zo">Ζω</button>
+          </div>
+          <div class="note-row align-right">
+            <button class="note-btn" id="note-low-ga">Γα</button>
+          </div>
+        </div>
+        <div id="pitch-control">
+          <button class="pitch-btn" id="pitch-down">-</button>
+          <p id="pitch-shift">pitch</p>
+          <button class="pitch-btn" id="pitch-up">+</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
