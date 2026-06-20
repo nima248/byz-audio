@@ -8,7 +8,7 @@ export class SamplePlayer {
   /* Wraps a Howler object for audio playback
    * of a single audio file.
    * Can play multiple instances of the same
-   * file 
+   * file
    */
   constructor(
     audioUrl,
@@ -48,13 +48,10 @@ export class SamplePlayer {
     this._rate = 2 ** (semitonesOffset / 12);
   }
 
-  play(pan = 0) {
+  play(volume, pan = 0) {
     this._allowPlay = true;
+    this._fullVolume = volume;
     this._addPlayback(pan);
-  }
-
-  cancelScheduledPlays() {
-    this._allowPlay = false;
   }
 
   /* Add a new playing instance */
@@ -82,6 +79,10 @@ export class SamplePlayer {
       this._playingIds.add(id);
       this._fadein(id);
     });
+  }
+
+  cancelScheduledPlays() {
+    this._allowPlay = false;
   }
 
   stopId(id, fast = false) {

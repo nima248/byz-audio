@@ -1,19 +1,42 @@
 import { Sampler } from "../src/Sampler.js";
+import { SampleBank } from "../src/SampleBank.js";
 import { ScaleManager } from "../src/ScaleManager.js";
 
 const MAX_PITCH_SHIFT = 12;
 const MIN_PITCH_SHIFT = -14;
-
 const ACTIVE_NOTE_CLASS = "active-note";
 const NO_AUDIO_AVAILABLE_CLASS = "no-audio-available";
+const DEFAULT_AUDIO_TYPE = "vox1";
 
-const sampler = new Sampler("./audio-files.json", {
+const sampleBank = new SampleBank(
+  "https://audio.byzison.xyz/",
+  "manifest.json",
+);
+const audioType = DEFAULT_AUDIO_TYPE;
+const samplerA = new Sampler(sampleBank, audioType, {
   nVoices: 4,
+  volumeMult: 0.7,
   debug: false,
 });
-const audioType = "vox1";
+const samplerB = new Sampler(sampleBank, audioType, {
+  nVoices: 4,
+  volumeMult: 0.7,
+  debug: false,
+});
+
+sampleBank.initialise();
+samplerA.initialise(audioType);
+samplerB.initialise(audioType);
+sampleBank.getAudioTypes().then((types) => {
+  let log = `${types.length} available audio types:`;
+  types.forEach((type) => {
+    log += `\n  - ${type}`;
+  });
+  console.log(log);
+});
 console.log("initial audio type set to ", audioType);
-sampler.initialise(audioType);
+let activeSampler = samplerA;
+
 const scaleManager = new ScaleManager();
 
 const noteButtons = document.querySelectorAll(".note-btn");
@@ -37,11 +60,11 @@ function freqOfButton(button) {
 }
 
 async function setNotesAudioAvailableStatusAsync() {
-  await sampler.audioManifestLoaded();
+  await sampleBank.audioManifestLoaded();
   let haveAnyAudio = false;
   noteButtons.forEach((button) => {
     const freq = freqOfButton(button);
-    if (sampler.haveAudioForFreq(freq)) {
+    if (activeSampler.haveAudioForFreq(freq, true)) {
       haveAnyAudio = true;
       button.classList.remove(NO_AUDIO_AVAILABLE_CLASS);
     } else {
@@ -49,14 +72,17 @@ async function setNotesAudioAvailableStatusAsync() {
     }
   });
   if (!haveAnyAudio) {
-    console.error("No available audio for audio type ", sampler.getAudioType());
+    console.error(
+      "No available audio for audio type ",
+      activeSampler.getAudioType(),
+    );
   }
 }
 
 function loadAudioAvailableNotes() {
   const enBut = getAudioAvailableButtons();
   const freqs = enBut.map((b) => freqOfButton(b));
-  sampler.loadSound(freqs);
+  activeSampler.loadSound(freqs);
 }
 
 function getAudioAvailableButtons() {
@@ -75,7 +101,7 @@ function activateNoteButton(button) {
 }
 
 async function turnOffSound() {
-  sampler.stop();
+  activeSampler.stop();
   if (activeNoteButton) {
     activeNoteButton.classList.remove(ACTIVE_NOTE_CLASS);
     activeNoteButton = null;
@@ -107,9 +133,9 @@ noteButtons.forEach((button) => {
   });
 });
 
-async function noteHandler(button, gui_press = true) {
+async function noteHandler(button) {
   if (
-    (button.classList.contains(ACTIVE_NOTE_CLASS) && gui_press) ||
+    button.classList.contains(ACTIVE_NOTE_CLASS) ||
     button.classList.contains(NO_AUDIO_AVAILABLE_CLASS)
   ) {
     // deactivate
@@ -124,7 +150,7 @@ async function noteHandler(button, gui_press = true) {
     button.classList.add(ACTIVE_NOTE_CLASS);
     activeNoteButton = button;
     const freq = freqOfButton(button);
-    sampler.playFrequency(freq);
+    activeSampler.playFrequency(freq);
   }
 }
 
@@ -147,8 +173,8 @@ pitchButtons.forEach((button) => {
     setNotesAudioAvailableStatusAsync().then(() => loadAudioAvailableNotes());
     if (activeNoteButton !== null) {
       const freq = freqOfButton(activeNoteButton);
-      if (sampler.haveAudioForFreq(freq)) {
-        sampler.playFrequency(freq);
+      if (activeSampler.haveAudioForFreq(freq)) {
+        activeSampler.playFrequency(freq);
       } else {
         activeNoteButton.classList.add(NO_AUDIO_AVAILABLE_CLASS);
         turnOffSound();
