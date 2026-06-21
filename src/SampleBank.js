@@ -63,10 +63,15 @@ export class SampleBank {
   /* Loads the audio for a single voice for each of the
    * notes, if one is not already loaded.
    */
-  loadSound(audioType, notes) {
+  loadSound(audioType, notes, nVoices = 1) {
+    let loadedPromises = [];
     notes.forEach((n) => {
-      this.getSamplePlayers(audioType, n.name, 1); // create a new player if none are present
+      const samplePlayers = this.getSamplePlayers(audioType, n.name, nVoices); // create a new player if none are present
+      samplePlayers.forEach((sp) => {
+        loadedPromises.push(sp.isLoaded());
+      });
     });
+    return Promise.all(loadedPromises);
   }
 
   /* Return the list of SamplePlayer objects

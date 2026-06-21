@@ -22,11 +22,11 @@ export class Sampler {
     { nVoices = DEFAULT_N_VOICES, volumeMult = 1.0, debug = false } = {},
   ) {
     this._sampleBank = sampleBank;
+    this._audioType = audioType;
     this._nVoices = nVoices;
     this._volumeMult = volumeMult;
     this._debug = debug;
 
-    this._audioType = audioType;
     this._playbackRequested = false;
     this._lastNote = null;
     this._playTimeoutIds = new Set();
@@ -53,9 +53,9 @@ export class Sampler {
     return this._audioType;
   }
 
-  loadSound(frequencies) {
+  loadSound(frequencies, nVoices = 1) {
     const notes = frequencies.map((f) => util.calculateWestNote(f));
-    this._sampleBank.loadSound(this._audioType, notes);
+    return this._sampleBank.loadSound(this._audioType, notes, nVoices);
   }
 
   haveAudioForFreq(frequency, noMatchOk = false) {

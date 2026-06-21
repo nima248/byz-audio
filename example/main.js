@@ -123,7 +123,13 @@ if (document.readyState === "complete") {
 }
 
 addEventListener("DOMContentLoaded", () => {
-  setNotesAudioAvailableStatusAsync().then(() => loadAudioAvailableNotes());
+  setNotesAudioAvailableStatusAsync()
+    .then(() => {
+      loadAudioAvailableNotes();
+    })
+    .then(() => {
+      console.log("Initial audio load complete");
+    });
 });
 
 noteButtons.forEach((button) => {
