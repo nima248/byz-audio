@@ -93,15 +93,15 @@ export class SampleBank {
     }
     if (nCreate > 0) {
       const currNSamplePlayers = audioTypeMap.get(noteName).length;
-      const nUrls = this.urlsOfNote(audioType, noteName).length;
+      const urls = this.urlsOfNote(audioType, noteName);
+      const nUrls = urls.length;
       const maxNSamplePlayers = Math.min(nCreate, nUrls);
       for (let i = currNSamplePlayers; i < maxNSamplePlayers; i++) {
-        const url = this.urlsOfNote(audioType, noteName)[i];
         let loopWithoutFade, volume;
         loopWithoutFade = false;
         audioTypeMap
           .get(noteName)
-          .push(new SamplePlayer(url, loopWithoutFade, volume));
+          .push(new SamplePlayer(urls[i], loopWithoutFade, volume));
       }
     }
     return audioTypeMap.get(noteName);
