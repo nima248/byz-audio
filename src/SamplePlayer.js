@@ -44,6 +44,10 @@ export class SamplePlayer {
     this._debug = debug;
   }
 
+  async isLoaded() {
+    return this._loadedPromise;
+  }
+
   setSemitonesOffset(semitonesOffset) {
     this._rate = 2 ** (semitonesOffset / 12);
   }

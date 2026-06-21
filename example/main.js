@@ -25,8 +25,8 @@ const samplerB = new Sampler(sampleBank, audioType, {
 });
 
 sampleBank.initialise();
-samplerA.initialise(audioType);
-samplerB.initialise(audioType);
+samplerA.initialise();
+samplerB.initialise();
 sampleBank.getAudioTypes().then((types) => {
   let log = `${types.length} available audio types:`;
   types.forEach((type) => {
