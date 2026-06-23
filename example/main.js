@@ -1,4 +1,4 @@
-import { Sampler } from "../src/Sampler.js";
+import { LayerSampler } from "../src/LayerSampler.js";
 import { SampleBank } from "../src/SampleBank.js";
 import { ScaleManager } from "../src/ScaleManager.js";
 
@@ -13,12 +13,12 @@ const sampleBank = new SampleBank(
   "manifest.json",
 );
 const audioType = DEFAULT_AUDIO_TYPE;
-const samplerA = new Sampler(sampleBank, audioType, {
+const samplerA = new LayerSampler(sampleBank, audioType, {
   nVoices: 4,
   volumeMult: 0.7,
   debug: false,
 });
-const samplerB = new Sampler(sampleBank, audioType, {
+const samplerB = new LayerSampler(sampleBank, audioType, {
   nVoices: 4,
   volumeMult: 0.7,
   debug: false,
@@ -64,7 +64,7 @@ async function setNotesAudioAvailableStatusAsync() {
   let haveAnyAudio = false;
   noteButtons.forEach((button) => {
     const freq = freqOfButton(button);
-    if (activeSampler.haveAudioForFreq(freq, true)) {
+    if (activeSampler.haveAudioForFreq(freq, false)) {
       haveAnyAudio = true;
       button.classList.remove(NO_AUDIO_AVAILABLE_CLASS);
     } else {

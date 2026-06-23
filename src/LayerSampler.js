@@ -1,14 +1,15 @@
 import * as math from "./math.js";
 import * as util from "./util.js";
+import { BasicSampler } from "./BasicSampler.js";
 
 const DEFAULT_N_VOICES = 3;
 const NOTE_CHANGE_SPREAD_MS = 350;
 const TOTAL_RESTART_TIME_MS = 9000; // should be approx length of audios
 
-export class Sampler {
+export class LayerSampler extends BasicSampler {
   /* Manages SamplePlayer objects by directing them when to play.
-   * Plays one note (e.g. D) at a time with multiple voices starting at
-   * different times.
+   * Plays one note (e.g. D) at a time with multiple voices starting
+   * and restarting at different times.
    * If multiple samples are given per note, a random one is played.
    * If nVoices is > 1, multiple instances are played simultaneously
    * with randomised timing, and different samples are used if available.
@@ -19,14 +20,12 @@ export class Sampler {
   constructor(
     sampleBank,
     audioType,
-    { nVoices = DEFAULT_N_VOICES, volumeMult = 1.0, debug = false } = {},
+    { volume = 1.0, nVoices = DEFAULT_N_VOICES, debug = false } = {},
   ) {
-    this._sampleBank = sampleBank;
-    this._audioType = audioType;
-    this._nVoices = nVoices;
-    this._volumeMult = volumeMult;
-    this._debug = debug;
+    super(sampleBank, audioType, { volume: volume });
 
+    this._nVoices = nVoices;
+    this._debug = debug;
     this._playbackRequested = false;
     this._lastNote = null;
     this._playTimeoutIds = new Set();
@@ -49,27 +48,9 @@ export class Sampler {
     return this._playbackRequested;
   }
 
-  getAudioType() {
-    return this._audioType;
-  }
-
-  loadSound(frequencies, nVoices = 1) {
-    const notes = frequencies.map((f) => util.calculateWestNote(f));
-    return this._sampleBank.loadSound(this._audioType, notes, nVoices);
-  }
-
-  haveAudioForFreq(frequency, noMatchOk = false) {
+  playFrequency(frequency) {
     const note = util.calculateWestNote(frequency);
-    return this._sampleBank.haveAudioForNote(
-      this._audioType,
-      note.name,
-      noMatchOk,
-    );
-  }
-
-  playFrequency(frequency, noMatchOk = false) {
-    const note = util.calculateWestNote(frequency);
-    if (!this._sampleBank.haveAudioForNote(this._audioType, note.name)) {
+    if (!this._sampleBank.haveAudioForNote(this._audioType, note.name, true)) {
       return false;
     }
     this._playbackRequested = true;
@@ -83,7 +64,7 @@ export class Sampler {
     const samplePlayers = this._sampleBank.getSamplePlayers(
       this._audioType,
       note.name,
-      this._nVoices,
+      true,
     );
     samplePlayers.forEach((player) => {
       player.setSemitonesOffset(note.semitonesOffset);
@@ -93,7 +74,10 @@ export class Sampler {
       const thisPlayerI = (startPlayerI + i) % samplePlayers.length;
       const id = setTimeout(() => {
         const pan = this._panValues[i];
-        samplePlayers[thisPlayerI].play(this._volume, pan);
+        samplePlayers[thisPlayerI].play(this._playerVolume, {
+          pan: pan,
+          loop: true,
+        });
         this._playingPlayers.push(samplePlayers[thisPlayerI]);
       }, this._noteChangeSpreadMs[i]);
       this._playTimeoutIds.add(id);
@@ -166,7 +150,7 @@ export class Sampler {
   }
 
   _calculateVolume() {
-    this._volume = (0.8 / this._nVoices ** (3 / 5)) * this._volumeMult;
+    this._playerVolume = (0.8 / this._nVoices ** (3 / 5)) * this._volume;
   }
 
   _calculatePanValues() {

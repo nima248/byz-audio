@@ -66,7 +66,7 @@ export class SampleBank {
   loadSound(audioType, notes, nVoices = 1) {
     let loadedPromises = [];
     notes.forEach((n) => {
-      const samplePlayers = this.getSamplePlayers(audioType, n.name, nVoices); // create a new player if none are present
+      const samplePlayers = this.getSamplePlayers(audioType, n.name, true); // create a new player if none are present
       samplePlayers.forEach((sp) => {
         loadedPromises.push(sp.isLoaded());
       });
@@ -83,7 +83,7 @@ export class SampleBank {
    * note is the number of different audio files
    * available for that note.
    */
-  getSamplePlayers(audioType, noteName, nCreate = 0) {
+  getSamplePlayers(audioType, noteName, createNew = false) {
     if (!this._samplePlayers.has(audioType)) {
       this._samplePlayers.set(audioType, new Map());
     }
@@ -91,17 +91,11 @@ export class SampleBank {
     if (!audioTypeMap.has(noteName)) {
       audioTypeMap.set(noteName, []);
     }
-    if (nCreate > 0) {
+    if (createNew) {
       const currNSamplePlayers = audioTypeMap.get(noteName).length;
       const urls = this.urlsOfNote(audioType, noteName);
-      const nUrls = urls.length;
-      const maxNSamplePlayers = Math.min(nCreate, nUrls);
-      for (let i = currNSamplePlayers; i < maxNSamplePlayers; i++) {
-        let loopWithoutFade, volume;
-        loopWithoutFade = false;
-        audioTypeMap
-          .get(noteName)
-          .push(new SamplePlayer(urls[i], loopWithoutFade, volume));
+      for (let i = currNSamplePlayers; i < urls.length; i++) {
+        audioTypeMap.get(noteName).push(new SamplePlayer(urls[i]));
       }
     }
     return audioTypeMap.get(noteName);
@@ -109,16 +103,19 @@ export class SampleBank {
 
   urlsOfNote(audioType, noteName) {
     const files = this._audioManifest[this._audioFormat][audioType][noteName];
+    if (!files) {
+      return [];
+    }
     return files.map(
       (f) => `${this._urlRoot}${this._audioFormat}/${audioType}/${f}`,
     );
   }
 
-  haveAudioForNote(audioType, noteName, noMatchOk) {
+  haveAudioForNote(audioType, noteName, warnNoMatch = false) {
     const hasAudio = Object.keys(
       this._audioManifest[this._audioFormat][audioType],
     ).includes(noteName);
-    if (!hasAudio && !noMatchOk) {
+    if (!hasAudio && warnNoMatch) {
       console.warn(`Note ${noteName} ${audioType} has no matching audio file`);
     }
     return hasAudio;

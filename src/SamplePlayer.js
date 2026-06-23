@@ -10,12 +10,7 @@ export class SamplePlayer {
    * Can play multiple instances of the same
    * file
    */
-  constructor(
-    audioUrl,
-    loopWithoutFade = false,
-    fullVolume = 1.0,
-    debug = false,
-  ) {
+  constructor(audioUrl, { fullVolume = 1.0, debug = false } = {}) {
     this._loadedPromiseResolve = null;
     this._loadedPromise = new Promise((resolve) => {
       this._loadedPromiseResolve = resolve;
@@ -29,9 +24,8 @@ export class SamplePlayer {
       onload: () => {
         this._loadedPromiseResolve();
       },
-      loop: loopWithoutFade,
+      loop: false,
     });
-    this._loopWithoutFade = loopWithoutFade;
     this._fullVolume = fullVolume;
     this._playingIds = new Set();
     this._restartMutex = new Mutex();
@@ -52,14 +46,14 @@ export class SamplePlayer {
     this._rate = 2 ** (semitonesOffset / 12);
   }
 
-  play(volume, pan = 0) {
+  play(volume, { pan = 0, loop = false } = {}) {
     this._allowPlay = true;
     this._fullVolume = volume;
-    this._addPlayback(pan);
+    this._addPlayback({ pan: pan, fadeIn: loop });
   }
 
   /* Add a new playing instance */
-  _addPlayback(pan) {
+  _addPlayback({ pan = 0, fadeIn = false }) {
     this._loadedPromise.then(() => {
       if (!this._allowPlay) {
         return;
@@ -81,7 +75,11 @@ export class SamplePlayer {
       );
       this._howl.rate(this._rate, id);
       this._playingIds.add(id);
-      this._fadein(id);
+      if (fadeIn) {
+        this._fadein(id);
+      } else {
+        this._howl.volume(this._fullVolume, id);
+      }
     });
   }
 
@@ -111,7 +109,7 @@ export class SamplePlayer {
       /* End critical section */
       .then(() => {
         this._restartMutex.unlock();
-        this._addPlayback(pan);
+        this._addPlayback({ pan: pan, fadeIn: true });
       })
       .catch((err) => {
         if (err.message !== "BreakChain") throw err;
