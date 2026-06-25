@@ -63,7 +63,8 @@ export class SampleBank {
   /* Loads the audio for a single voice for each of the
    * notes, if one is not already loaded.
    */
-  loadSound(audioType, notes, nVoices = 1) {
+  async loadSound(audioType, notes, nVoices = 1) {
+    await this.audioManifestLoaded();
     let loadedPromises = [];
     notes.forEach((n) => {
       const samplePlayers = this.getSamplePlayers(audioType, n.name, true); // create a new player if none are present
