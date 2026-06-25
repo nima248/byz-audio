@@ -33,6 +33,10 @@ export function calculateWestNote(frequency) {
   };
 }
 
+export function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function getSupportedAudioFormat() {
   const audio = document.createElement("audio");
 

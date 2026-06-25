@@ -58,7 +58,10 @@ export class BasicSampler {
     this._lastNote = note;
   }
 
-  stop(note) {
+  stop(note = null) {
+    if (note === null) {
+      note = this._lastNote;
+    }
     this._sampleBank
       .getSamplePlayers(this._audioType, note.name)
       .forEach((player) => {
