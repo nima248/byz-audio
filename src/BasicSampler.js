@@ -13,6 +13,7 @@ export class BasicSampler {
 
     this._monophonic = monophonic;
     this._lastPlayedPlayer = null;
+    this._lastNote = null;
   }
 
   initialise() {
@@ -60,6 +61,9 @@ export class BasicSampler {
 
   stop(note = null) {
     if (note === null) {
+      if (!this._lastNote) {
+        return;
+      }
       note = this._lastNote;
     }
     this._sampleBank
